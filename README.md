@@ -44,7 +44,7 @@ X-LSP-Id: 123
     "processId": null,
     "workspaceFolders": [
         {
-            "uri": "file:///home/foobar/myproject
+            "uri": "file:///home/foobar/myproject"
         }
     ]
 }
@@ -57,10 +57,11 @@ Content-Length: 194
 
 {
     "id": "1234",
-    "result": {...}, // optional
-    "error": {...} // optional
+    "result": {},
+    "error": {}
 }
 ```
+(the `result` and `error` keys are optional)
 
 The following HTTP codes are returned:
 - `200 OK`: A response to a request, without an error.
