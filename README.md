@@ -54,14 +54,15 @@ X-LSP-Id: 123
 HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 194
+X-LSP-Id: 123
 
 {
-    "id": "1234",
-    "result": {},
-    "error": {}
+    "capabilities": {},
+    "serverInfo": {}
 }
 ```
-(the `result` and `error` keys are optional)
+
+The response body will contain the JSON-RPC `result` data in case of a successful request. Otherwise, it will contain the `error` data. The `X-LSP-Id` header will be set to the ID of the corresponding request.
 
 The following HTTP codes are returned:
 - `200 OK`: A response to a request, without an error.

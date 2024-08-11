@@ -48,7 +48,7 @@ func handleRequest(lspSrv *lsp.Server, w http.ResponseWriter, req *http.Request)
 	defer req.Body.Close()
 	err := json.NewDecoder(req.Body).Decode(&params)
 	if err != nil {
-		lspResp = errorResponse("unknown", http.StatusBadRequest, "unable to unmarshal request json")
+		lspResp = errorResponse(id, http.StatusBadRequest, "unable to unmarshal request json")
 	} else if req.Method != http.MethodPost {
 		lspResp = errorResponse(id, http.StatusMethodNotAllowed, "method not allowed")
 	} else if pathMethod == "" {
@@ -71,9 +71,16 @@ func handleRequest(lspSrv *lsp.Server, w http.ResponseWriter, req *http.Request)
 
 	data := []byte{}
 	if !lspResp.Notification {
-		data, err = json.Marshal(&lspResp)
-		if err != nil {
-			slog.Error("unable to marshal response json", "err", err)
+		if lspResp.Error != nil {
+			data, err = json.Marshal(&lspResp.Error)
+			if err != nil {
+				slog.Error("unable to marshal response error json", "err", err)
+			}
+		} else {
+			data, err = json.Marshal(&lspResp.Result)
+			if err != nil {
+				slog.Error("unable to marshal response result json", "err", err)
+			}
 		}
 	}
 
@@ -83,6 +90,7 @@ func handleRequest(lspSrv *lsp.Server, w http.ResponseWriter, req *http.Request)
 	if !lspResp.Notification {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Content-Length", strconv.Itoa(len(data)))
+		w.Header().Set(idHeader, id)
 	}
 
 	if lspResp.Error != nil {
@@ -93,7 +101,7 @@ func handleRequest(lspSrv *lsp.Server, w http.ResponseWriter, req *http.Request)
 
 	_, err = w.Write(data)
 	if err != nil {
-		slog.Error("error writing response body", "err", err)
+		slog.Error("error writing response data", "err", err)
 	}
 }
 
